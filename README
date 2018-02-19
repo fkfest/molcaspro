@@ -1,0 +1,9 @@
+Use 
+coef=molcaspro('molcas.orbs');
+to resort coefficient in the MOLPRO order. The MOLPRO overlap matrix has to be in 'overlap.molpro' file. 
+
+The tolerance in molcaspro.m can be changed according to the accuracy of the overlap matrices. 
+
+Use 
+dlmwrite('molpro.orbdump',coef);
+to store coefficients for matrop load in MOLPRO. One can use splitorb script from https://bitbucket.org/kats/dumpham project to split the orbitals to smaller chunks (otherwise MOLPRO might complain...) 
