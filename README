@@ -6,4 +6,5 @@ The tolerance in molcaspro.m can be changed according to the accuracy of the ove
 
 Use 
 dlmwrite('molpro.orbdump',coef);
-to store coefficients for matrop load in MOLPRO. One can use splitorb script from https://bitbucket.org/kats/dumpham project to split the orbitals to smaller chunks (otherwise MOLPRO might complain...) 
+to store coefficients for matrop load in MOLPRO. 
+One can use splitorb script from https://bitbucket.org/kats/dumpham project to split the orbitals to smaller chunks (otherwise MOLPRO might complain...) 
