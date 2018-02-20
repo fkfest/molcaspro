@@ -42,8 +42,7 @@ for i=1:size(mat1,1)
 end
 notset=find(~ind, 1);
 if ~isempty(notset)
-    disp("Increase tolerance value!");
-    exit;
+    error("Increase tolerance value!");
 end
 minres=norm(mat1(ind,ind)-mat2);
 %minres=1000;
