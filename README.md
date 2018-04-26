@@ -21,7 +21,7 @@ write,S,molpro.ovlp,new
 
 <u>**Script**</u>
 
-3) *Use script `molcaspro.sh` or `molcaspro_nosym.sh` for symmetric or non-symmetric orbitals, respectivelly.*
+3) *Use script `molcaspro.sh` or `molcaspro_nosym.sh` for symmetric or non-symmetric orbitals, respectively.*
 ```
 molcaspro.sh molpro.ovlp "<MOLPRO symmetry string>" molcas.ScfOrb "<MOLCAS symmetry string>"
 or
