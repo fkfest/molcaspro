@@ -2,6 +2,16 @@
 # script to transform MOLCAS orbitals to MOLPRO orbitals
 # Usage: molcaspro.sh <MOLPRO AO-Overlap> "<Symmetry line (11A1  +   4B1  +   7B2  +   2A2)>" <MOLCAS Orbitals> "<Symmetries (a1  b1  a2  b2)>"
 ####################################################
+
+if command -v matlab >/dev/null 2>&1; then
+  MATLAB="matlab -nodesktop -nosplash"
+elif command -v octave >/dev/null 2>&1; then 
+  OCTAVE="octave"
+else
+  echo "Matlab or octave are required!"
+  exit 1
+fi
+
 if [ $# -lt 4 ]; then
   echo 'Usage: molcaspro.sh <MOLPRO AO-Overlap> "<Symmetry line (11A1  +   4B1  +   7B2  +   2A2)>" <MOLCAS Orbitals> "<Symmetries (a1  b1  a2  b2)>"'
   exit
@@ -37,7 +47,14 @@ mv molcas.orbs.tmp molcas.orbs
 # generate the orbitals
 echo "addpath('$MCPPATH/')
 [dims,symord]=dimsym('$2','$4');
-molcaspro('molcas.orbs','molpro.orbdump',dims,symord);" | matlab -nodesktop -nosplash
+molcaspro('molcas.orbs','molpro.orbdump',dims,symord);" > mcp.m
+
+if [ -n "$MATLAB" ]; then
+  cat mcp.m | $MATLAB
+else
+  $OCTAVE mcp.m
+fi
+rm mcp.m
 
 # split the orbitals
 "$MCPPATH/splitorb" molpro.orbdump > molpro.orbdump.tmp

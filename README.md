@@ -1,6 +1,7 @@
 # Readme
 
 A bunch of MATLAB (and BASH) scripts to transform MOLCAS orbital coefficients to MOLPRO.
+Requires MATLAB or OCTAVE.
 HOW-TO:
 
 1) *Generate orbital coefficients in MOLCAS. Let's assume they are called `molcas.ScfOrb`.*

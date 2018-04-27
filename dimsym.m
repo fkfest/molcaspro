@@ -1,5 +1,5 @@
 function [dims,iord]=dimsym(symmp,symmc)
-mp=upper(strtrim(split(symmp,'+')));
+mp=upper(strtrim(strsplit(symmp,'+')));
 dimss=regexp(mp,'^\d*','Match');
 dims=zeros([1,length(dimss)]);
 for isym=1:length(mp)
@@ -7,9 +7,10 @@ for isym=1:length(mp)
         error('Some symmetries dont have the corresponding number of functions!');
     end
     dims(isym)=str2double(dimss{isym}(1));
-    mp(isym)=extractAfter(mp(isym),length(num2str(dims(isym))));
+    mpsym=mp{isym};
+    mp{isym}=mpsym(length(num2str(dims(isym)))+1:end);
 end
-mc=upper(strtrim(split(symmc)));
+mc=upper(strtrim(strsplit(symmc)));
 if length(mp) ~= length(mc)
     error('Number of symmetries differ');
 end
