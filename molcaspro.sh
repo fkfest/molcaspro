@@ -37,6 +37,10 @@ for SYM in $SYMMC; do
   fi
 done
 
+#orbname
+orbname=$(basename -- "$3")
+orbname="${orbname%.*}.orbdump"
+
 # clean the MOLCAS orbital file
 cat "$3"| sed -e/ORBITAL/\{ -e:1 -en\;b1 -e\} -ed | sed '/OCC/,$d' > molcas.orbs
 # prepare the overlap and orbitals
@@ -47,7 +51,7 @@ mv molcas.orbs.tmp molcas.orbs
 # generate the orbitals
 echo "addpath('$MCPPATH/')
 [dims,symord]=dimsym('$2','$4');
-molcaspro('molcas.orbs','molpro.orbdump',dims,symord);" > mcp.m
+molcaspro('molcas.orbs','$orbname',dims,symord);" > mcp.m
 
 if [ -n "$MATLAB" ]; then
   cat mcp.m | $MATLAB
@@ -57,5 +61,5 @@ fi
 rm mcp.m
 
 # split the orbitals
-"$MCPPATH/splitorb" molpro.orbdump > molpro.orbdump.tmp
-mv molpro.orbdump.tmp molpro.orbdump
+"$MCPPATH/splitorb" $orbname > $orbname.tmp
+mv $orbname.tmp $orbname

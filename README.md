@@ -28,13 +28,13 @@ molcaspro.sh molpro.ovlp "<MOLPRO symmetry string>" molcas.ScfOrb "<MOLCAS symme
 or
 molcaspro_nosym.sh molpro.ovlp <number of basis functions> molcas.ScfOrb
 ```
-The resulting orbitals for MOLPRO will be in `molpro.orbdump`.
+The resulting orbitals for MOLPRO will be in `<name>.orbdump` with <name> taken from the molcas-orbitals filename.
 
 For example, for a water molecule in the C2v symmetry it will be
 ```
 molcaspro.sh h2o.ovlp "11A1  +   4B1  +   7B2  +   2A2" h2o.ScfOrb "a1  b1  a2  b2"
 ```
-(the order of irreps differs in this case between MOLCAS and MOLPRO)
+(the order of irreps differs in this case between MOLCAS and MOLPRO) with the final orbitals in h2o.orbdump.
 
 <u>**Manually**</u>
 
