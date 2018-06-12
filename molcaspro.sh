@@ -40,6 +40,7 @@ done
 #orbname
 orbname=$(basename -- "$3")
 orbname="${orbname%.*}.orbdump"
+orbname="$(echo "$orbname" | tr '[:upper:]' '[:lower:]')"
 
 # clean the MOLCAS orbital file
 cat "$3"| sed -e/ORBITAL/\{ -e:1 -en\;b1 -e\} -ed | sed '/OCC/,$d' > molcas.orbs
@@ -60,6 +61,8 @@ else
 fi
 rm mcp.m
 
-# split the orbitals
-"$MCPPATH/splitorb" $orbname > $orbname.tmp
-mv $orbname.tmp $orbname
+if [ -f "$orbname" ]; then
+  # split the orbitals
+  "$MCPPATH/splitorb" "$orbname" > "$orbname.tmp"
+  mv "$orbname.tmp" "$orbname"
+fi
