@@ -24,11 +24,11 @@ write,S,molpro.ovlp,new
 
 3) *Use script `molcaspro.sh` or `molcaspro_nosym.sh` for symmetric or non-symmetric orbitals, respectively.*
 ```
-molcaspro.sh molpro.ovlp "<MOLPRO symmetry string>" molcas.ScfOrb "<MOLCAS symmetry string>"
+molcaspro.sh molpro.ovlp "<MOLPRO symmetry string>" molcas.ScfOrb "<MOLCAS symmetry string>" [auxmolcas.ScfOrb]
 or
-molcaspro_nosym.sh molpro.ovlp <number of basis functions> molcas.ScfOrb
+molcaspro_nosym.sh molpro.ovlp <number of basis functions> molcas.ScfOrb [auxmolcas.ScfOrb]
 ```
-The resulting orbitals for MOLPRO will be in `<name>.orbdump` with `<name>` taken from the molcas-orbitals filename.
+The resulting orbitals for MOLPRO will be in `<name>.orbdump` with `<name>` taken from the molcas-orbitals filename. Auxiliary MOLCAS orbitals can be provided for calculation of the AO overlap in the case if the molcas.ScfOrb have been altered.
 
 For example, for a water molecule in the C2v symmetry it will be
 ```

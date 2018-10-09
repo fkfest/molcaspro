@@ -48,7 +48,7 @@ cat "$3"| sed -e/ORBITAL/\{ -e:1 -en\;b1 -e\} -ed | sed '/OCC/,$d' > molcas.orbs
 "$MCPPATH/joinorb" "$1" "$2" > overlap.molpro
 "$MCPPATH/joinorb" molcas.orbs "$NMC" > molcas.orbs.tmp
 mv molcas.orbs.tmp molcas.orbs
-molcasorbs="molcas.orbs"
+molcasorbs="'molcas.orbs'"
 
 if [ $# -gt 4 ]; then
   # auxiliary orbitals for generation of the AO overlap
@@ -56,13 +56,13 @@ if [ $# -gt 4 ]; then
   cat "$5"| sed -e/ORBITAL/\{ -e:1 -en\;b1 -e\} -ed | sed '/OCC/,$d' > auxmolcas.orbs
   "$MCPPATH/joinorb" auxmolcas.orbs "$NMC" > auxmolcas.orbs.tmp
   mv auxmolcas.orbs.tmp auxmolcas.orbs
-  molcasorbs="{auxmolcas.orbs,molcas.orbs}"
+  molcasorbs="{'auxmolcas.orbs','molcas.orbs'}"
 fi
 
 # generate the orbitals
 echo "addpath('$MCPPATH/')
 [dims,symord]=dimsym('$2','$4');
-molcaspro('$molcasorbs','$orbname',dims,symord);" > mcp.m
+molcaspro($molcasorbs,'$orbname',dims,symord);" > mcp.m
 
 if [ -n "$MATLAB" ]; then
   cat mcp.m | $MATLAB

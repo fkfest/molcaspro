@@ -13,7 +13,7 @@ else
 fi
 
 if [ $# -lt 3 ]; then
-  echo 'Usage: molcaspro.sh <MOLPRO AO-Overlap> "<Number of basis functions>" <MOLCAS Orbitals>'
+  echo 'Usage: molcaspro.sh <MOLPRO AO-Overlap> "<Number of basis functions>" <MOLCAS Orbitals> [<Auxiliary MOLCAS orbitals>]'
   exit
 fi
 
@@ -29,10 +29,20 @@ cat "$3"| sed -e/ORBITAL/\{ -e:1 -en\;b1 -e\} -ed | sed '/OCC/,$d' > molcas.orbs
 "$MCPPATH/joinorb" "$1" $2 > overlap.molpro
 "$MCPPATH/joinorb" molcas.orbs $2 > molcas.orbs.tmp
 mv molcas.orbs.tmp molcas.orbs
+molcasorbs="'molcas.orbs'"
+
+if [ $# -gt 3 ]; then
+  # auxiliary orbitals for generation of the AO overlap
+  # clean the MOLCAS orbital file
+  cat "$4"| sed -e/ORBITAL/\{ -e:1 -en\;b1 -e\} -ed | sed '/OCC/,$d' > auxmolcas.orbs
+  "$MCPPATH/joinorb" auxmolcas.orbs "$NMC" > auxmolcas.orbs.tmp
+  mv auxmolcas.orbs.tmp auxmolcas.orbs
+  molcasorbs="{'auxmolcas.orbs','molcas.orbs'}"
+fi
 
 # generate the orbitals
 echo "addpath('$MCPPATH/')
-molcaspro('molcas.orbs','$orbname');" > mcp.m
+molcaspro($molcasorbs,'$orbname');" > mcp.m
 
 if [ -n "$MATLAB" ]; then
   cat mcp.m | $MATLAB

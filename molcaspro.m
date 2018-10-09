@@ -20,9 +20,10 @@ end
 %do we have one or two input orbitals?
 %if we have na cell array - first set of orbitals is to get the overlap
 %and the second - to transform to molpro
-twoorbs=false
+twoorbs=false;
 if iscellstr(coefmc) 
-  twoorbs=true
+  disp('Two MOLCAS orbitals files');
+  twoorbs=true;
   Cmc=dlmread(coefmc{1});
   Cmc2sort=dlmread(coefmc{2});
   if length(Cmc) ~= length(Cmc2sort)
