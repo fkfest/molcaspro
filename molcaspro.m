@@ -17,8 +17,22 @@ else
         error('Mismatch in dimension and order arrays!');
     end
 end
+%do we have one or two input orbitals?
+%if we have na cell array - first set of orbitals is to get the overlap
+%and the second - to transform to molpro
+twoorbs=false
+if iscellstr(coefmc) 
+  twoorbs=true
+  Cmc=dlmread(coefmc{1});
+  Cmc2sort=dlmread(coefmc{2});
+  if length(Cmc) ~= length(Cmc2sort)
+    error('Mismatch in two MOLCAS orbitals sets!');
+  end
+else
+  Cmc=dlmread(coefmc);
+end
+
 %SAOmc=dlmread('overlap.molcas');
-Cmc=dlmread(coefmc);
 Cmp=zeros(size(Cmc,1));
 SAOmp=dlmread(smolpro);
 if nosym
@@ -46,7 +60,12 @@ for isym=1:length(dimsym)
     SAOmps0(abs(SAOmps0)<tol)=0;
     ind=match2mat(SAOmcs0,SAOmps0,tol*10);
     norm(SAOmcs(ind,ind)-SAOmps)
-    coef=Cmcs(:,ind)';
+    if twoorbs
+      Cmcs2sort=Cmc2sort(offmc(isym):dimsym(isym)+offmc(isym)-1,1:dimsym(isym));
+      coef=Cmcs2sort(:,ind)';
+    else
+      coef=Cmcs(:,ind)';
+    end
     if isym == 1
         dlmwrite(coefmp,coef,'precision','%-18.14e');
     else

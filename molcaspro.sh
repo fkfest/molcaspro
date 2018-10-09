@@ -13,7 +13,7 @@ else
 fi
 
 if [ $# -lt 4 ]; then
-  echo 'Usage: molcaspro.sh <MOLPRO AO-Overlap> "<Symmetry line (11A1  +   4B1  +   7B2  +   2A2)>" <MOLCAS Orbitals> "<Symmetries (a1  b1  a2  b2)>"'
+  echo 'Usage: molcaspro.sh <MOLPRO AO-Overlap> "<Symmetry line (11A1  +   4B1  +   7B2  +   2A2)>" <MOLCAS Orbitals> "<Symmetries (a1  b1  a2  b2)>" [<Auxiliary MOLCAS orbitals>]'
   exit
 fi
 
@@ -48,11 +48,21 @@ cat "$3"| sed -e/ORBITAL/\{ -e:1 -en\;b1 -e\} -ed | sed '/OCC/,$d' > molcas.orbs
 "$MCPPATH/joinorb" "$1" "$2" > overlap.molpro
 "$MCPPATH/joinorb" molcas.orbs "$NMC" > molcas.orbs.tmp
 mv molcas.orbs.tmp molcas.orbs
+molcasorbs="molcas.orbs"
+
+if [ $# -gt 4 ]; then
+  # auxiliary orbitals for generation of the AO overlap
+  # clean the MOLCAS orbital file
+  cat "$5"| sed -e/ORBITAL/\{ -e:1 -en\;b1 -e\} -ed | sed '/OCC/,$d' > auxmolcas.orbs
+  "$MCPPATH/joinorb" auxmolcas.orbs "$NMC" > auxmolcas.orbs.tmp
+  mv auxmolcas.orbs.tmp auxmolcas.orbs
+  molcasorbs="{auxmolcas.orbs,molcas.orbs}"
+fi
 
 # generate the orbitals
 echo "addpath('$MCPPATH/')
 [dims,symord]=dimsym('$2','$4');
-molcaspro('molcas.orbs','$orbname',dims,symord);" > mcp.m
+molcaspro('$molcasorbs','$orbname',dims,symord);" > mcp.m
 
 if [ -n "$MATLAB" ]; then
   cat mcp.m | $MATLAB
