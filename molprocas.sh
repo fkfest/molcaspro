@@ -65,6 +65,6 @@ rm mpc.m
 
 if [ -f "$orbname" ]; then
   # split the orbitals
-#  "$MCPPATH/writeorbMC" "$orbname" > "$orbname.tmp"
-#  mv "$orbname.tmp" "$orbname"
+  "$MCPPATH/writeorbMC" "$orbname" > "$orbname.tmp"
+  mv "$orbname.tmp" "$orbname"
 fi
