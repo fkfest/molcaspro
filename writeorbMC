@@ -41,14 +41,22 @@ while IFS='' read -r line || [[ -n "$line" ]]; do
   let II=0
   for i in $(seq 1 $NN); do
     for j in $(seq 1 $NNUM); do
-      echo -n ${numbers[$II]} " "
+      if [[ ${numbers[$II]} == -* ]]; then
+        echo -n " "${numbers[$II]}
+      else
+        echo -n "  "${numbers[$II]}
+      fi
       let II=$II+1
     done
     echo
   done
   if [ $II -lt ${#numbers[*]} ]; then
     for j in $(seq 1 $NREST); do
-      echo -n ${numbers[$II]} " "
+      if [[ ${numbers[$II]} == -* ]]; then
+        echo -n " "${numbers[$II]}
+      else
+        echo -n "  "${numbers[$II]}
+      fi
       let II=$II+1
     done
     echo
