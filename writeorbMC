@@ -20,49 +20,35 @@ echo ${dimsym[*]}
 echo "*read from the Molpro file"
 echo "#ORB"
 
-firstline=1
-sym=1
-orb=1
-while IFS='' read -r line || [[ -n "$line" ]]; do
-  if [[ $firstline -eq 1 ]]; then
-    firstline=0
-    continue
-  fi
-  echo "* ORBITAL $sym $orb"
-  let orb=$orb+1
-  if [[ $orb -gt ${dimsym[$sym-1]} ]]; then
-    orb=1
-    let sym=$sym+1
-  fi
-
-  IFS=',' read -ra numbers <<< "$line"
-  let NN=${#numbers[*]}/$NNUM
-  let NREST=${#numbers[*]}-$NN*$NNUM
-  let II=0
-  for i in $(seq 1 $NN); do
-    for j in $(seq 1 $NNUM); do
-      if [[ ${numbers[$II]} == -* ]]; then
-        echo -n " "${numbers[$II]}
+awk -F"[, ]" -v nnum=$NNUM -v dimstr="${dimsym[*]}" '
+BEGIN {
+  ndim=split(dimstr,dims," ");
+  sym=1;
+  orb=1;
+}
+(NR>1 && NF>0){
+  printf "%s %d %d\n", "* ORBITAL", sym, orb;
+  len=0;
+  for(i=1;i<=NF;i++){
+    if ($i!="") { 
+      if (substr($i,1,1) == "-")
+        printf " %s", $i;
       else
-        echo -n "  "${numbers[$II]}
-      fi
-      let II=$II+1
-    done
-    echo
-  done
-  if [ $II -lt ${#numbers[*]} ]; then
-    for j in $(seq 1 $NREST); do
-      if [[ ${numbers[$II]} == -* ]]; then
-        echo -n " "${numbers[$II]}
-      else
-        echo -n "  "${numbers[$II]}
-      fi
-      let II=$II+1
-    done
-    echo
-  fi
-
-done < "$1"
+        printf "  %s", $i;
+      len++; 
+      if (len>=nnum || i==NF){
+        printf "\n";
+        len=0;
+      }
+    }
+  } 
+  ++orb;
+  if (orb>dims[sym]) {
+    ++sym;
+    orb=1;
+  }
+}
+' "$1"
 
 echo "#OCC"
 echo "* OCCUPATION NUMBERS"

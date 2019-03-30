@@ -1,0 +1,68 @@
+#!/bin/bash
+# split comma-separated orbital coefficients file to max $NNUM values in a row
+# and decorate with the MOLCAS info
+
+NNUM=5
+
+UHF=0
+ORIGIN=0
+
+IFS='' read -r line < "$1"
+IFS=',' read -ra dimsym <<< "$line"
+#echo $dimsym, number of symmetries: ${#dimsym[*]}
+# Molcas head
+echo "#INPORB 1.1"
+echo "#INFO"
+echo "* Molpro orbitals"
+echo $UHF ${#dimsym[*]} $ORIGIN
+echo ${dimsym[*]}
+echo ${dimsym[*]}
+echo "*read from the Molpro file"
+echo "#ORB"
+
+firstline=1
+sym=1
+orb=1
+while IFS='' read -r line || [[ -n "$line" ]]; do
+  if [[ $firstline -eq 1 ]]; then
+    firstline=0
+    continue
+  fi
+  echo "* ORBITAL $sym $orb"
+  let orb=$orb+1
+  if [[ $orb -gt ${dimsym[$sym-1]} ]]; then
+    orb=1
+    let sym=$sym+1
+  fi
+
+  IFS=',' read -ra numbers <<< "$line"
+  let NN=${#numbers[*]}/$NNUM
+  let NREST=${#numbers[*]}-$NN*$NNUM
+  let II=0
+  for i in $(seq 1 $NN); do
+    for j in $(seq 1 $NNUM); do
+      if [[ ${numbers[$II]} == -* ]]; then
+        echo -n " "${numbers[$II]}
+      else
+        echo -n "  "${numbers[$II]}
+      fi
+      let II=$II+1
+    done
+    echo
+  done
+  if [ $II -lt ${#numbers[*]} ]; then
+    for j in $(seq 1 $NREST); do
+      if [[ ${numbers[$II]} == -* ]]; then
+        echo -n " "${numbers[$II]}
+      else
+        echo -n "  "${numbers[$II]}
+      fi
+      let II=$II+1
+    done
+    echo
+  fi
+
+done < "$1"
+
+echo "#OCC"
+echo "* OCCUPATION NUMBERS"

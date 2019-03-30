@@ -9,36 +9,34 @@ if [[ $# -lt 2 ]]; then
   exit
 fi
 IFS=' ,+' read -ra DIMSRAW <<< "$2"
-DIMS=()
+DIMSY=
 for dim in "${DIMSRAW[@]}"; do
-  DIMS+=($(echo $dim | grep -oP "^\d*"))
+  DIMSY="$DIMSY $(echo $dim | grep -oP "^\d*")"
 done
-
-LEN=0
-ID=0
-NROW=0
-while IFS='' read -r line || [[ -n "$line" ]]; do
-
-  IFS=' ,' read -ra numbers <<< "$line"
-  if [[ ${#numbers[*]} -eq 0 ]]; then
-    continue
-  fi
-  num="$(echo -e "${numbers[0]}" | tr -d '[:space:]')"
-  if [[ $num != ?(-)@(+([0-9]).*([0-9])|*([0-9]).+([0-9]))?([eE]?(-|+)+([0-9])) ]]; then
-    # not a number
-    continue
-  fi
-  let LEN=$LEN+${#numbers[*]}
-  for numb in "${numbers[@]}"; do
-    echo -n " $numb"
-  done
-  if [[ $LEN -ge ${DIMS[$ID]} ]]; then
-    echo 
-    let LEN=0
-    let NROW=$NROW+1
-    if [[ $NROW -eq ${DIMS[$ID]} ]]; then
-      let ID=$ID+1
-      let NROW=0
-    fi 
-  fi
-done < "$1"
+awk -F"[, ]+" -v dimstr="$DIMSY" '
+BEGIN {
+  ndim=split(dimstr,dims," ");
+  cdim=1;
+  nl=0;
+  len=0;
+}
+#non-empty with a number
+(NF>0 && ($1 ~ /^[0-9eE\-\+\.]+$/ || ($1=="" && $2 ~ /^[0-9eE\-\+\.]+$/) ) ){
+  for(i=1;i<=NF;i++){
+    if ($i!="") { 
+      len++; 
+      printf "%s ", $i;
+    }
+  } 
+} 
+(len>=dims[cdim]) {
+  printf "\n";
+  nl++;
+  if(nl>=dims[cdim]) {
+    cdim++;
+    if (cdim>ndim) exit;
+    nl=0;
+  } 
+  len=0
+}
+' "$1"
