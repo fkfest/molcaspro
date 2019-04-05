@@ -1,12 +1,12 @@
 # Readme
 
-A bunch of MATLAB (and BASH) scripts to transform MOLCAS orbital coefficients to MOLPRO.
+A bunch of MATLAB (and BASH/awk) scripts to transform MOLCAS orbital coefficients to MOLPRO and vice versa.
 Requires MATLAB or OCTAVE.
-HOW-TO:
+HOW-TO transform orbitals:
 
-1) *Generate orbital coefficients in MOLCAS. Let's assume they are called `molcas.ScfOrb`.*
+1) *Generate orbital coefficients in MOLCAS. Let's assume they are called `molcas.ScfOrb`. For the MOLPRO to MOCAS transformation, this can be any set of orthogonal orbitals in the same basis and geometry as in MOLPRO.*
 
-2) *Generate an overlap matrix in MOLPRO (here `molpro.ovlp`) using the same basis and geometry as in MOLCAS*:
+2a) *For MOLCAS-MOLPRO transformation: Generate an overlap matrix in MOLPRO (here `molpro.ovlp`) using the same basis and geometry as in MOLCAS*:
 
 ```
 gdirect
@@ -14,13 +14,21 @@ geometry=...
 basis=...
 {matrop
 load,S,S
-write,S,molpro.ovlp,new
+write,S,molpro.ovlp,new,float
+}
+```
+2b) *For MOLPRO-MOLCAS transformation: Store MOLPRO coefficients in a text file (here `molpro.orbdump`)*:
+
+```
+{matrop
+load,ORB,...
+write,ORB,molpro.orbdump,new,float
 }
 ```
 
 **Now one can either use scripts or do things manually **
 
-<u>**Script**</u>
+<u>**Script for MOLCAS-MOLPRO**</u>
 
 3) *Use script `molcaspro.sh` or `molcaspro_nosym.sh` for symmetric or non-symmetric orbitals, respectively.*
 ```
@@ -36,7 +44,23 @@ molcaspro.sh h2o.ovlp "11A1  +   4B1  +   7B2  +   2A2" h2o.ScfOrb "a1  b1  a2  
 ```
 (the order of irreps differs in this case between MOLCAS and MOLPRO) with the final orbitals in h2o.orbdump.
 
+<u>**Script for MOLPRO-MOLCAS**</u>
+
+3) *Use script `molprocas.sh`.*
+```
+molprocas.sh molpro.orbdump "<MOLPRO symmetry string>" molcas.ScfOrb "<MOLCAS symmetry string>"
+```
+The resulting orbitals for MOLCAS will be in `<name>.MPOrb` with `<name>` taken from the molpro-orbitals filename.
+
+For example, for a water molecule in the C2v symmetry it will be
+```
+molcaspro.sh h2o.orbdump "11A1  +   4B1  +   7B2  +   2A2" h2o.ScfOrb "a1  b1  a2  b2"
+```
+(the order of irreps differs in this case between MOLCAS and MOLPRO) with the final orbitals in h2o.MPOrb.
+
 <u>**Manually**</u>
+
+(Described only for MOLCAS-MOLPRO transformation)
 
 3) *Delete lines before and after orbital coefficients in the MOLCAS file, and transform the coefficients and overlap to a MATLAB-readable format using script `joinorb`.*
 ```

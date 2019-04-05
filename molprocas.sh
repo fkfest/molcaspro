@@ -67,4 +67,5 @@ if [ -f "$orbname" ]; then
   # split the orbitals
   "$MCPPATH/writeorbMC" "$orbname" > "$orbname.tmp"
   mv "$orbname.tmp" "$orbname"
+  cat "$3"| sed -e/\#OCC/\{ -e:1 -en\;b1 -e\} -ed | sed '/\#ONE/,$d' >> "$orbname"
 fi

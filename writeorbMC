@@ -50,5 +50,3 @@ BEGIN {
 }
 ' "$1"
 
-echo "#OCC"
-echo "* OCCUPATION NUMBERS"
