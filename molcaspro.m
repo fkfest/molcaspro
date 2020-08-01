@@ -2,6 +2,7 @@ function Cmp = molcaspro(coefmc,coefmp,dimsym,symord)
 %match molcas to molpro basis order
 %dimsym: dimensions for each symmetry in molpro order
 %symord: order for symmetries: symord(isym_molcas)=isym_molpro
+way=1
 tol=1.d-7;
 smolpro='overlap.molpro';
 nosym=false;
@@ -52,20 +53,48 @@ offmc(symord)=offmcx;
 
 for isym=1:length(dimsym)
     Cmcs=Cmc(offmc(isym):dimsym(isym)+offmc(isym)-1,1:dimsym(isym));
-    SAOmcs=inv(Cmcs'*Cmcs);
+    [V,D]=eig(Cmcs'*Cmcs);
+    SAOmcs=V*inv(D)*V';
+    %SAOmcs=inv(Cmcs'*Cmcs);
     SAOmps=SAOmp(offmp(isym):dimsym(isym)+offmp(isym)-1,1:dimsym(isym));
-    %make small numbers zero
-    SAOmcs0=SAOmcs;
-    SAOmcs0(abs(SAOmcs0)<tol)=0;
-    SAOmps0=SAOmps;
-    SAOmps0(abs(SAOmps0)<tol)=0;
-    ind=match2mat(SAOmcs0,SAOmps0,tol*10);
-    norm(SAOmcs(ind,ind)-SAOmps)
-    if twoorbs
-      Cmcs2sort=Cmc2sort(offmc(isym):dimsym(isym)+offmc(isym)-1,1:dimsym(isym));
-      coef=Cmcs2sort(:,ind)';
+    fprintf('Max difference in eigenvalues of S: %e\n', max(abs(sort(eig(SAOmcs))- sort(eig(SAOmps)))));
+    if isym == 1
+      dlmwrite('molcas.overlap',SAOmcs,'precision','%-18.14e');
     else
-      coef=Cmcs(:,ind)';
+      dlmwrite('molcas.overlap',SAOmcs,'precision','%-18.14e','-append');
+    end
+    if way == 1
+      %sort
+      %make small numbers zero
+      SAOmcs0=SAOmcs;
+      SAOmcs0(abs(SAOmcs0)<tol)=0;
+      SAOmps0=SAOmps;
+      SAOmps0(abs(SAOmps0)<tol)=0;
+      ind=match2mat(SAOmcs0,SAOmps0,tol*10);
+      norm(SAOmcs(ind,ind)-SAOmps)
+      if twoorbs
+        Cmcs2sort=Cmc2sort(offmc(isym):dimsym(isym)+offmc(isym)-1,1:dimsym(isym));
+        coef=Cmcs2sort(:,ind)';
+      else
+        coef=Cmcs(:,ind)';
+      end
+    else
+      %transform, doesn't work yet...
+      [Vmc,Dmc]=eig(SAOmcs);
+      [DD,ind]=sort(diag(Dmc));
+      Vmc=Vmc(:,ind);
+      [Vmp,Dmp]=eig(SAOmps);
+      [DD,ind]=sort(diag(Dmp));
+      Vmp=Vmp(:,ind);
+      if twoorbs
+        Cmcs2sort=Cmc2sort(offmc(isym):dimsym(isym)+offmc(isym)-1,1:dimsym(isym));
+        coef=(Cmcs2sort*Vmc*Vmp')';
+      else
+        coef=(Cmcs*Vmc*Vmp')';
+      end
+      [V,D]=eig(coef*coef');
+      SS=V*inv(D)*V';
+      norm(SS-SAOmps)
     end
     if isym == 1
         dlmwrite(coefmp,coef,'precision','%-18.14e');

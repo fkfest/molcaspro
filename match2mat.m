@@ -40,14 +40,20 @@ for i=1:size(mat1,1)
         end
     end
 end
-notset=find(~ind, 1);
-if ~isempty(notset)
-    error('Increase tolerance value!');
+%set remaining
+notset1=find(~found);
+notset2=find(~ind);
+if length(notset1) ~= length(notset2)
+    error('Mismatch in sizes!');
+end
+for i=1:length(notset1)
+    ind(notset2(i))=notset1(i);
 end
 minres=norm(mat1(ind,ind)-mat2);
 %minres=1000;
 %ind=1:size(mat1,1);
-for i=1:size(mat1,1)
+for iter=1:1
+  for i=1:size(mat1,1)
     ind1=match2vec(mat1(ind,ind(i)),mat2(:,i),tol*10);
     res=norm(mat1(ind(ind1),ind(ind1))-mat2);
     if res < minres
@@ -57,5 +63,6 @@ for i=1:size(mat1,1)
     if res < tol
         return
     end
+  end
 end
 
