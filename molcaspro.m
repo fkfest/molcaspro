@@ -77,15 +77,13 @@ for isym=1:length(dimsym)
         coef=Cmcs2sort(:,ind)';
       else
         coef=Cmcs(:,ind)';
+        ind
       end
     else
-      %transform, doesn't work yet...
-      [Vmc,Dmc]=eig(SAOmcs);
-      [DD,ind]=sort(diag(Dmc));
-      Vmc=Vmc(:,ind);
-      [Vmp,Dmp]=eig(SAOmps);
-      [DD,ind]=sort(diag(Dmp));
-      Vmp=Vmp(:,ind);
+      %transform, might be buggy...
+      [Vmc,Dmc]=stableeig(SAOmcs);
+      [Vmp,Dmp]=stableeig(SAOmps);
+      %Vmc*Vmp'
       if twoorbs
         Cmcs2sort=Cmc2sort(offmc(isym):dimsym(isym)+offmc(isym)-1,1:dimsym(isym));
         coef=(Cmcs2sort*Vmc*Vmp')';
