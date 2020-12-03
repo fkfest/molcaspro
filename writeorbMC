@@ -11,7 +11,7 @@ IFS='' read -r line < "$1"
 IFS=',' read -ra dimsym <<< "$line"
 #echo $dimsym, number of symmetries: ${#dimsym[*]}
 # Molcas head
-echo "#INPORB 1.1"
+echo "#INPORB 2.2"
 echo "#INFO"
 echo "* Molpro orbitals"
 echo $UHF ${#dimsym[*]} $ORIGIN
