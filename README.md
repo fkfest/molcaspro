@@ -1,4 +1,4 @@
-# Readme
+# MolCasPro
 
 A bunch of MATLAB (and BASH/awk) scripts to transform MOLCAS orbital coefficients to MOLPRO and vice versa.
 Requires MATLAB or OCTAVE.
@@ -6,7 +6,7 @@ HOW-TO transform orbitals:
 
 1) *Generate orbital coefficients in MOLCAS. Let's assume they are called `molcas.ScfOrb`. For the MOLPRO to MOCAS transformation, this can be any set of orthogonal orbitals in the same basis and geometry as in MOLPRO.*
 
-2a) *For MOLCAS-MOLPRO transformation: Generate an overlap matrix in MOLPRO (here `molpro.ovlp`) using the same basis and geometry as in MOLCAS*:
+2) (a) *For MOLCAS-MOLPRO transformation: Generate an overlap matrix in MOLPRO (here `molpro.ovlp`) using the same basis and geometry as in MOLCAS*:
 
 ```
 gdirect
@@ -17,7 +17,7 @@ load,S,S
 write,S,molpro.ovlp,new,float
 }
 ```
-2b) *For MOLPRO-MOLCAS transformation: Store MOLPRO coefficients in a text file (here `molpro.orbdump`)*:
+2) (b) *For MOLPRO-MOLCAS transformation: Store MOLPRO coefficients in a text file (here `molpro.orbdump`)*:
 
 ```
 {matrop
@@ -26,7 +26,7 @@ write,ORB,molpro.orbdump,new,float
 }
 ```
 
-**Now one can either use scripts or do things manually **
+**Now one can either use scripts or do things manually**
 
 <u>**Script for MOLCAS-MOLPRO**</u>
 
